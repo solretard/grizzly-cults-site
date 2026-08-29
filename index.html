@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grizzly Cults</title>
+<style>
+  @font-face {
+    font-family: 'Stencil';
+    src: local('Arial Black');
+  }
+
+  :root {
+    --bg: #12160F;
+    --moss: #1E2A1C;
+    --bone: #E8DFC8;
+    --flame: #D9491A;
+    --lichen: #7A8B4F;
+    --blood: #B33A2E;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--bone);
+    font-family: 'Courier New', monospace;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(122,139,79,0.05) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(217,73,26,0.04) 0%, transparent 40%);
+  }
+
+  /* noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .stencil {
+    font-family: Impact, 'Arial Narrow Bold', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  a { color: inherit; }
+
+  /* ---- nav ---- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 6vw;
+    background: linear-gradient(to bottom, rgba(18,22,15,0.95), transparent);
+  }
+
+  .nav-mark {
+    font-family: Impact, sans-serif;
+    text-transform: uppercase;
+    font-size: 20px;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-mark::before {
+    content: '';
+    width: 10px; height: 10px;
+    background: var(--flame);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--flame);
+  }
+
+  .nav-links { display: flex; gap: 32px; font-size: 13px; letter-spacing: 0.05em; }
+  .nav-links a { text-decoration: none; opacity: 0.75; border-bottom: 1px solid transparent; transition: 0.2s; }
+  .nav-links a:hover { opacity: 1; border-color: var(--flame); }
+
+  /* ---- hero ---- */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 6vw 60px;
+    position: relative;
+    border-bottom: 1px dashed rgba(232,223,200,0.15);
+  }
+
+  .hero-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.35em;
+    color: var(--lichen);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.2s;
+  }
+
+  .hero h1 {
+    font-family: Impact, 'Arial Narrow Bold', sans-serif;
+    text-transform: uppercase;
+    font-size: clamp(52px, 12vw, 148px);
+    line-height: 0.88;
+    letter-spacing: -0.01em;
+    color: var(--bone);
+    text-shadow: 4px 4px 0 var(--blood), 8px 8px 0 rgba(0,0,0,0.4);
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.4s;
+  }
+
+  .hero-sub {
+    max-width: 560px;
+    margin: 32px auto 0;
+    font-size: 15px;
+    line-height: 1.8;
+    color: rgba(232,223,200,0.7);
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.6s;
+  }
+
+  .hero-sub strong { color: var(--flame); font-weight: normal; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cta-row {
+    margin-top: 44px;
+    display: flex;
+    gap: 18px;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 0.8s;
+  }
+
+  .btn {
+    font-family: inherit;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 15px 30px;
+    border: 1px solid var(--bone);
+    background: transparent;
+    color: var(--bone);
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.25s;
+    position: relative;
+  }
+
+  .btn-primary {
+    background: var(--flame);
+    border-color: var(--flame);
+    color: var(--bg);
+    font-weight: bold;
+  }
+  .btn-primary:hover { background: var(--bone); border-color: var(--bone); }
+  .btn:not(.btn-primary):hover { background: var(--bone); color: var(--bg); }
+
+  .ledger-strip {
+    margin-top: 60px;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: rgba(232,223,200,0.45);
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 1s;
+  }
+
+  /* ---- torn divider ---- */
+  .torn {
+    height: 40px;
+    width: 100%;
+    background: var(--bg);
+    clip-path: polygon(0% 40%, 3% 20%, 6% 45%, 9% 10%, 12% 38%, 15% 15%, 18% 42%, 21% 5%, 24% 35%, 27% 18%, 30% 44%, 33% 12%, 36% 38%, 39% 20%, 42% 46%, 45% 8%, 48% 36%, 51% 22%, 54% 44%, 57% 14%, 60% 40%, 63% 18%, 66% 42%, 69% 10%, 72% 36%, 75% 24%, 78% 44%, 81% 15%, 84% 38%, 87% 20%, 90% 45%, 93% 12%, 96% 40%, 100% 25%, 100% 100%, 0% 100%);
+  }
+
+  /* ---- section shell ---- */
+  section {
+    padding: 100px 6vw;
+    position: relative;
+  }
+
+  .section-tag {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    color: var(--lichen);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-tag::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(122,139,79,0.3);
+  }
+
+  .section-title {
+    font-family: Impact, sans-serif;
+    text-transform: uppercase;
+    font-size: clamp(32px, 5vw, 56px);
+    margin-bottom: 36px;
+    max-width: 720px;
+  }
+
+  /* ---- lore / manifesto ---- */
+  .manifesto {
+    background: var(--moss);
+    border-top: 1px solid rgba(122,139,79,0.25);
+    border-bottom: 1px solid rgba(122,139,79,0.25);
+  }
+
+  .manifesto-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+
+  .lore-body p {
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 20px;
+    color: rgba(232,223,200,0.85);
+  }
+
+  .lore-body .drop {
+    font-family: Impact, sans-serif;
+    font-size: 64px;
+    float: left;
+    line-height: 0.8;
+    margin: 4px 10px 0 0;
+    color: var(--flame);
+  }
+
+  .stamp-box {
+    border: 2px solid var(--flame);
+    padding: 28px;
+    transform: rotate(-2deg);
+    position: relative;
+    background: rgba(217,73,26,0.04);
+  }
+
+  .stamp-box::before {
+    content: 'CERTIFIED';
+    position: absolute;
+    top: -12px; left: 20px;
+    background: var(--moss);
+    padding: 0 10px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--flame);
+  }
+
+  .stamp-box h4 {
+    font-family: Impact, sans-serif;
+    text-transform: uppercase;
+    font-size: 20px;
+    margin-bottom: 14px;
+    color: var(--bone);
+  }
+
+  .stamp-box ul { list-style: none; font-size: 14px; line-height: 2; color: rgba(232,223,200,0.75); }
+  .stamp-box ul li::before { content: '✦ '; color: var(--flame); }
+
+  /* ---- commandments ---- */
+  .commandments {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .commandment {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 30px;
+    padding: 30px 0;
+    border-bottom: 1px dashed rgba(232,223,200,0.15);
+    align-items: baseline;
+  }
+  .commandment:first-child { border-top: 1px dashed rgba(232,223,200,0.15); }
+
+  .commandment-num {
+    font-family: Impact, sans-serif;
+    font-size: 42px;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--flame);
+  }
+
+  .commandment h3 {
+    font-family: Impact, sans-serif;
+    text-transform: uppercase;
+    font-size: 22px;
+    margin-bottom: 8px;
+    color: var(--bone);
+  }
+
+  .commandment p {
+    font-size: 14px;
+    line-height: 1.75;
+    color: rgba(232,223,200,0.65);
+    max-width: 560px;
+  }
+
+  /* ---- bear gallery ---- */
+  .bear-gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .bear-frame {
+    aspect-ratio: 1;
+    border: 2px solid var(--lichen);
+    overflow: hidden;
+    position: relative;
+    background: var(--moss);
+    transition: 0.3s;
+  }
+  .bear-frame:hover {
+    border-color: var(--flame);
+    transform: translateY(-4px);
+  }
+  .bear-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .bear-frame .bear-tag {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(18,22,15,0.85);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    padding: 6px 10px;
+    color: var(--bone);
+  }
+
+  /* ---- ranks ---- */
+  .ranks-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: rgba(232,223,200,0.15);
+    border: 1px solid rgba(232,223,200,0.15);
+  }
+
+  .rank-card {
+    background: var(--bg);
+    padding: 36px 24px;
+    text-align: center;
+    transition: 0.3s;
+  }
+  .rank-card:hover { background: var(--moss); }
+
+  .rank-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+    filter: grayscale(0.3);
+  }
+
+  .rank-card h4 {
+    font-family: Impact, sans-serif;
+    text-transform: uppercase;
+    font-size: 17px;
+    margin-bottom: 8px;
+    color: var(--flame);
+  }
+
+  .rank-card p {
+    font-size: 12px;
+    line-height: 1.6;
+    color: rgba(232,223,200,0.6);
+  }
+
+  .rank-req {
+    display: block;
+    margin-top: 12px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--lichen);
+  }
+
+  /* ---- faq ---- */
+  .faq-list { max-width: 720px; }
+  .faq-item {
+    border-bottom: 1px solid rgba(232,223,200,0.12);
+    padding: 24px 0;
+  }
+  .faq-q {
+    font-family: Impact, sans-serif;
+    text-transform: uppercase;
+    font-size: 17px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    color: var(--bone);
+  }
+  .faq-q::after { content: '+'; color: var(--flame); font-size: 22px; }
+  .faq-item.open .faq-q::after { content: '−'; }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    font-size: 14px;
+    line-height: 1.8;
+    color: rgba(232,223,200,0.65);
+  }
+  .faq-item.open .faq-a { max-height: 200px; margin-top: 14px; }
+
+  /* ---- footer ---- */
+  footer {
+    padding: 60px 6vw 40px;
+    text-align: center;
+    border-top: 1px dashed rgba(232,223,200,0.15);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: rgba(232,223,200,0.4);
+  }
+
+  .footer-links { display: flex; justify-content: center; gap: 24px; margin-bottom: 24px; }
+  .footer-links a { text-decoration: none; opacity: 0.7; }
+  .footer-links a:hover { opacity: 1; color: var(--flame); }
+
+  /* reveal on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 800px) {
+    .manifesto-grid { grid-template-columns: 1fr; }
+    .ranks-grid { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  :focus-visible { outline: 2px solid var(--flame); outline-offset: 3px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-mark">Grizzly Cults</div>
+  <div class="nav-links">
+    <a href="#lore">Lore</a>
+    <a href="#bears">Bears</a>
+    <a href="#laws">Laws</a>
+    <a href="#ranks">Ranks</a>
+    <a href="#join">Join</a>
+    <a href="app.html">The Den →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">A SECRET SOCIETY OF 199 BEARS · XRP LEDGER</div>
+  <h1 class="stencil">Grizzly<br>Cults</h1>
+  <p class="hero-sub">
+    Deep in a forest nobody can find twice, 199 bears have organized a cult around two sacred relics: <strong>the Salmon</strong> and <strong>the Honeycomb</strong>. Membership is permanent. Napping is mandatory.
+  </p>
+  <div class="cta-row">
+    <a href="app.html" class="btn btn-primary">Enter The Den</a>
+    <a href="#lore" class="btn">Read The Lore</a>
+  </div>
+  <div class="ledger-strip">199 BEARS TOTAL · 0 INITIATED · MINT DATE: TBA</div>
+</section>
+
+<div class="torn"></div>
+
+<section class="manifesto" id="lore">
+  <div class="section-tag">ORIGIN STORY</div>
+  <div class="manifesto-grid">
+    <div class="lore-body reveal">
+      <p><span class="drop">I</span>t started with a bear named Gary who found a honeycomb so perfect he refused to eat it. Instead he built it a shrine out of river stones. Word spread. More bears came. Some brought salmon as offerings. Nobody remembers who declared it a cult, but by the third gathering there were rules, a chant, and a guy in charge of snacks.</p>
+      <p>Today the Grizzly Cult numbers exactly 199 — no more, no less, because the forest only fits 199 good hiding spots. Each bear holds a rank, a grudge against squirrels, and a small non-transferable piece of the shrine.</p>
+      <p>This is not a metaphor for anything. It is just bears, being extremely serious about a sandwich.</p>
+    </div>
+    <div class="stamp-box reveal">
+      <h4>What You Actually Get</h4>
+      <ul>
+        <li>1 of 199 unique Grizzly Cult NFTs on the XRP Ledger</li>
+        <li>A permanent (fictional) seat at the Cave Council</li>
+        <li>Access to The Den — the members-only app</li>
+        <li>Bragging rights over people who joined a normal community</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="bears">
+  <div class="section-tag">FIELD SIGHTINGS</div>
+  <h2 class="section-title stencil">A Few Bears From The Shrine</h2>
+  <div class="bear-gallery reveal">
+    <div class="bear-frame"><img src="assets/bears/21.webp" alt="Grizzly Cult bear #21"><div class="bear-tag">#021</div></div>
+    <div class="bear-frame"><img src="assets/bears/53.webp" alt="Grizzly Cult bear #53"><div class="bear-tag">#053</div></div>
+    <div class="bear-frame"><img src="assets/bears/68.webp" alt="Grizzly Cult bear #68"><div class="bear-tag">#068</div></div>
+    <div class="bear-frame"><img src="assets/bears/94.webp" alt="Grizzly Cult bear #94"><div class="bear-tag">#094</div></div>
+  </div>
+</section>
+
+<section id="laws">
+  <div class="section-tag">THE SACRED LAWS</div>
+  <h2 class="section-title stencil">Rules Carved Into The Shrine</h2>
+  <div class="commandments">
+    <div class="commandment reveal">
+      <div class="commandment-num">I</div>
+      <div><h3>Thou Shalt Nap First, Ask Questions Later</h3><p>All cult business is conducted after a mandatory nap. Meetings called before noon are automatically postponed.</p></div>
+    </div>
+    <div class="commandment reveal">
+      <div class="commandment-num">II</div>
+      <div><h3>The Honeycomb Is Not For Eating</h3><p>It is a symbol. Symbols are sacred. Symbols are also, frankly, extremely tempting, which is the whole test.</p></div>
+    </div>
+    <div class="commandment reveal">
+      <div class="commandment-num">III</div>
+      <div><h3>Never Trust A Bear Without a Salmon</h3><p>Ownership of a Grizzly Cult NFT is proof of salmon. No salmon, no vote at Cave Council.</p></div>
+    </div>
+    <div class="commandment reveal">
+      <div class="commandment-num">IV</div>
+      <div><h3>199 Is The Number. There Is No Second Batch.</h3><p>The forest has 199 hiding spots. We are not cutting down trees to make room for more. That would defeat the point.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="torn"></div>
+
+<section class="manifesto" id="ranks">
+  <div class="section-tag">CAVE HIERARCHY</div>
+  <h2 class="section-title stencil">Know Your Rank</h2>
+  <div class="ranks-grid reveal">
+    <div class="rank-card">
+      <div class="rank-icon">🐾</div>
+      <h4>Cub</h4>
+      <p>Fresh initiate. Still figuring out the chant.</p>
+      <span class="rank-req">Default rank</span>
+    </div>
+    <div class="rank-card">
+      <div class="rank-icon">🍯</div>
+      <h4>Keeper</h4>
+      <p>Sworn protector of the Honeycomb shrine.</p>
+      <span class="rank-req">Assigned at random</span>
+    </div>
+    <div class="rank-card">
+      <div class="rank-icon">🐟</div>
+      <h4>Grizzled</h4>
+      <p>Has survived at least one squirrel incident.</p>
+      <span class="rank-req">Veteran trait holders</span>
+    </div>
+    <div class="rank-card">
+      <div class="rank-icon">👑</div>
+      <h4>Cave Elder</h4>
+      <p>Sits on the Council. Naps the longest.</p>
+      <span class="rank-req">Rarest traits only</span>
+    </div>
+  </div>
+</section>
+
+<section id="join">
+  <div class="section-tag">FAQ · READ BEFORE INITIATION</div>
+  <h2 class="section-title stencil">Questions The Council Will Answer</h2>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q">Is this a real cult?</div>
+      <div class="faq-a">Only in the sense that it has rules, ranks, and an unreasonable devotion to honey. No robes required.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What chain is this on?</div>
+      <div class="faq-a">XRP Ledger. Fast, cheap, and bear-approved.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">When does mint go live?</div>
+      <div class="faq-a">Date and price are being decided by the Cave Council. Check The Den or follow socials for the announcement.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is there a token?</div>
+      <div class="faq-a">No. Just 199 bears and the honor of the shrine. Utility may be added later if the Council votes on it.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-links">
+    <a href="#">X / Twitter</a>
+    <a href="#">Telegram</a>
+    <a href="app.html">The Den</a>
+  </div>
+  <div>© 2026 GRIZZLY CULTS · 199 BEARS · ALL RIGHTS RESERVED TO THE SHRINE</div>
+</footer>
+
+<script>
+  const revealEls = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => obs.observe(el));
+
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+</script>
+
+</body>
+</html>
