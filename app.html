@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Den — Grizzly Cults</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <style>
   :root {
-    --bg: #12160F;
-    --moss: #1E2A1C;
+    --bg: #17181C;
+    --moss: #1F2340;
     --bone: #E8DFC8;
-    --flame: #D9491A;
-    --lichen: #7A8B4F;
-    --blood: #B33A2E;
+    --flame: #F2B33D;
+    --lichen: #E48CAE;
+    --blood: #3A4FCB;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -41,7 +42,7 @@
     border-bottom: 1px dashed rgba(232,223,200,0.15);
     position: sticky;
     top: 0;
-    background: rgba(18,22,15,0.95);
+    background: rgba(23,24,28,0.95);
     backdrop-filter: blur(6px);
     z-index: 50;
   }
@@ -147,8 +148,8 @@
   .gate {
     text-align: center;
     padding: 80px 40px;
-    border: 2px dashed rgba(217,73,26,0.4);
-    background: rgba(217,73,26,0.03);
+    border: 2px dashed rgba(242,179,61,0.4);
+    background: rgba(242,179,61,0.03);
     margin-bottom: 60px;
   }
   .gate-icon { font-size: 40px; margin-bottom: 20px; }
@@ -175,7 +176,7 @@
     grid-template-columns: 220px 1fr;
     gap: 40px;
     background: var(--moss);
-    border: 1px solid rgba(122,139,79,0.3);
+    border: 1px solid rgba(228,140,174,0.3);
     padding: 36px;
     margin-bottom: 50px;
     align-items: center;
@@ -224,7 +225,7 @@
     align-items: center;
     gap: 12px;
   }
-  .section-tag::after { content: ''; flex: 1; height: 1px; background: rgba(122,139,79,0.3); }
+  .section-tag::after { content: ''; flex: 1; height: 1px; background: rgba(228,140,174,0.3); }
 
   .council-feed { margin-bottom: 60px; }
   .feed-item {
@@ -239,7 +240,7 @@
 
   .mint-panel {
     border: 2px solid var(--flame);
-    background: rgba(217,73,26,0.04);
+    background: rgba(242,179,61,0.04);
     padding: 40px;
     text-align: center;
     position: relative;
@@ -330,7 +331,7 @@
   <!-- member view shown after connect (demo state) -->
   <div class="member-view" id="memberView">
     <div class="bear-card">
-      <div class="bear-portrait"><img src="assets/bears/21.webp" alt="Your Grizzly Cult bear"></div>
+      <div class="bear-portrait"><img src="assets/bears/22.webp" alt="Your Grizzly Cult bear"></div>
       <div class="bear-info">
         <span class="rank-pill">Cub</span>
         <h3>Unnamed Bear</h3>
